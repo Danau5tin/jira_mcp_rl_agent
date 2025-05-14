@@ -1,0 +1,2 @@
+prompt,expected_tools,final_msg_facts
+"Can you get me MBA-6 please, and let me know what the title is?","jira_tool","The title of MBA-6 is XYZ."
