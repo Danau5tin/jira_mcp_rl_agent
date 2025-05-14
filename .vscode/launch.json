@@ -1,0 +1,12 @@
+{
+    "version": "0.1.0",
+    "configurations": [
+        {
+            "name": "run_evals",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/evals/runner_adk.py",
+            "console": "integratedTerminal"
+        },
+    ]
+}
