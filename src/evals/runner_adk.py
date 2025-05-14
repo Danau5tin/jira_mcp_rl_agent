@@ -91,16 +91,16 @@ async def run_evaluation(
     """
     print(f"Creating agent for evaluation with prompt: {eval_data.prompt[:50]}...")
     agent = await create_agent(
-        model_name, 
-        jira_url, 
-        jira_username, 
-        jira_api_token, 
-        enabled_tools
+        litellm_model_name=model_name,
+        jira_url=jira_url,
+        jira_username=jira_username,
+        jira_api_token=jira_api_token,
+        enabled_tools=enabled_tools,
     )
     
     print("Running agent...")
-    await run_agent(agent, USER_ID, SESSION_ID, eval_data.prompt)
-    print("Agent run completed.")
+    trajectory = await run_agent(agent, USER_ID, SESSION_ID, eval_data.prompt)
+    print(f"Agent run completed with trajectory: {trajectory}")
 
 
 async def main(csv_file: Optional[str] = None) -> None:

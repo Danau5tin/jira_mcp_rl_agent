@@ -1,3 +1,4 @@
+import datetime
 from google.adk.agents.llm_agent import LlmAgent
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
@@ -5,8 +6,10 @@ from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParamet
 from google.adk.models.lite_llm import LiteLlm
 from google.genai import types
 
-APP_NAME = "jira_mcp_agent"
+from src.evals.trajectory import Message, Trajectory, parse_events_to_trajectory
 
+
+APP_NAME = "jira_mcp_agent"
 
 async def create_agent(
     litellm_model_name: str,
@@ -23,16 +26,11 @@ async def create_agent(
                 "run",
                 "--rm",
                 "-i",
-                "--name",
-                "mcp-atlassian",
-                "-e",
-                "JIRA_URL",
-                "-e",
-                "JIRA_USERNAME",
-                "-e",
-                "JIRA_API_TOKEN",
-                "-e",
-                "ENABLED_TOOLS",
+                "--name", "mcp-atlassian",
+                "-e", "JIRA_URL",
+                "-e", "JIRA_USERNAME",
+                "-e", "JIRA_API_TOKEN",
+                "-e", "ENABLED_TOOLS",
                 "ghcr.io/sooperset/mcp-atlassian:latest",
             ],
             env={
@@ -54,7 +52,7 @@ async def create_agent(
 
 async def run_agent(
     agent: LlmAgent, user_id: str, session_id: str, prompt: str
-):
+) -> Trajectory:
     """Runs the agent with the given message."""
     session_service = InMemorySessionService()
     runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_service)
@@ -62,10 +60,19 @@ async def run_agent(
         app_name=APP_NAME, user_id=user_id, session_id=session_id
     )
 
+    timestamp_usr_msg = datetime.datetime.now().timestamp()
+    user_msg = Message(
+        author="user", role="user",
+        user_text_input=prompt,
+        timestamp=timestamp_usr_msg,
+    )
+
     content = types.Content(role="user", parts=[types.Part(text=prompt)])
-    async for event in runner.run_async(
-        user_id=user_id, session_id=session_id, new_message=content
-    ):
-        if event.is_final_response():
-            final_msg = event.content.parts[0].text
-            print(f"Final response: {final_msg}")
+    new_events = []
+    async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
+        new_events.append(event)
+
+    trajectory = parse_events_to_trajectory(new_events)
+    trajectory.messages.insert(0, user_msg)
+
+    return trajectory
