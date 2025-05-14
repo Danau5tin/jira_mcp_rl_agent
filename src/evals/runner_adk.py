@@ -45,7 +45,7 @@ def validate_environment() -> Dict[str, str]:
     return env_vars
 
 
-async def manage_docker_container(action: Literal["start", "stop"]) -> None:
+async def manage_docker_container(action: Literal["stop"]) -> None:
     """
     Manage the Docker container (start or stop).
     
@@ -121,15 +121,15 @@ async def main(csv_file: Optional[str] = None) -> None:
     
     csv_file = csv_file or DEFAULT_CSV_FILE
     
-    try:
-        await manage_docker_container("stop")
-        
+    try:       
         eval_data_list = await load_eval_data(csv_file)
         if not eval_data_list:
             raise ValueError(f"No evaluation data found in {csv_file}. Please check the file.")
         print(f"Loaded {len(eval_data_list)} evaluation data points.")
         
         for i, eval_data in enumerate(eval_data_list):
+            await manage_docker_container("stop")
+
             print(f"\nRunning evaluation {i+1}/{len(eval_data_list)}...")
             try:
                 await run_evaluation(
