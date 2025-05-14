@@ -53,7 +53,7 @@ async def create_agent(
 
 
 async def run_agent(
-    agent: LlmAgent, user_id: str, session_id: str, message: types.Content
+    agent: LlmAgent, user_id: str, session_id: str, prompt: str
 ):
     """Runs the agent with the given message."""
     session_service = InMemorySessionService()
@@ -61,8 +61,10 @@ async def run_agent(
     session_service.create_session(
         app_name=APP_NAME, user_id=user_id, session_id=session_id
     )
+
+    content = types.Content(role="user", parts=[types.Part(text=prompt)])
     async for event in runner.run_async(
-        user_id=user_id, session_id=session_id, new_message=message
+        user_id=user_id, session_id=session_id, new_message=content
     ):
         if event.is_final_response():
             final_msg = event.content.parts[0].text

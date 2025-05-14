@@ -1,2 +1,3 @@
 prompt,expected_tools,final_msg_facts
 "Can you get me MBA-6 please, and let me know what the title is?","jira_tool","The title of MBA-6 is XYZ."
+"Can you create a ticket to build the checkout?","jira_tool_create","I created the task."
