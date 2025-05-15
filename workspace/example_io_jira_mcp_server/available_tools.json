@@ -1,0 +1,368 @@
+[
+    {
+        "name": "jira_get_issue",
+        "description": "Get details of a specific Jira issue including its Epic links and relationship information.\n\n    Args:\n        ctx: The FastMCP context.\n        issue_key: Jira issue key.\n        fields: Fields to return.\n        expand: Optional fields to expand.\n        comment_limit: Maximum number of comments.\n        properties: Issue properties to return.\n        update_history: Whether to update issue view history.\n\n    Returns:\n        JSON string representing the Jira issue object.\n    ",
+        "inputSchema": {
+            "properties": {
+                "issue_key": {
+                    "description": "Jira issue key (e.g., 'PROJ-123')",
+                    "title": "Issue Key",
+                    "type": "string"
+                },
+                "fields": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": "description,updated,summary,labels,assignee,issuetype,reporter,status,priority,created",
+                    "description": "Fields to return. Can be a comma-separated list (e.g., 'summary,status,customfield_10010'), '*all' for all fields (including custom fields), or omitted for essential fields only.",
+                    "title": "Fields"
+                },
+                "expand": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Optional fields to expand. Examples: 'renderedFields' (for rendered content), 'transitions' (for available status transitions), 'changelog' (for history)",
+                    "title": "Expand"
+                },
+                "comment_limit": {
+                    "default": 10,
+                    "description": "Maximum number of comments to include (0 or null for no comments)",
+                    "maximum": 100,
+                    "minimum": 0,
+                    "title": "Comment Limit",
+                    "type": "integer"
+                },
+                "properties": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "A comma-separated list of issue properties to return",
+                    "title": "Properties"
+                },
+                "update_history": {
+                    "default": true,
+                    "description": "Whether to update the issue view history for the requesting user",
+                    "title": "Update History",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "issue_key"
+            ],
+            "title": "get_issueArguments",
+            "type": "object"
+        },
+        "annotations": null
+    },
+    {
+        "name": "jira_search",
+        "description": "Search Jira issues using JQL (Jira Query Language).\n\n    Args:\n        ctx: The FastMCP context.\n        jql: JQL query string.\n        fields: Comma-separated fields to return.\n        limit: Maximum number of results.\n        start_at: Starting index for pagination.\n        projects_filter: Comma-separated list of project keys to filter by.\n        expand: Optional fields to expand.\n\n    Returns:\n        JSON string representing the search results including pagination info.\n    ",
+        "inputSchema": {
+            "properties": {
+                "jql": {
+                    "description": "JQL query string (Jira Query Language). Examples:\n- Find Epics: \"issuetype = Epic AND project = PROJ\"\n- Find issues in Epic: \"parent = PROJ-123\"\n- Find by status: \"status = 'In Progress' AND project = PROJ\"\n- Find by assignee: \"assignee = currentUser()\"\n- Find recently updated: \"updated >= -7d AND project = PROJ\"\n- Find by label: \"labels = frontend AND project = PROJ\"\n- Find by priority: \"priority = High AND project = PROJ\"",
+                    "title": "Jql",
+                    "type": "string"
+                },
+                "fields": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": "description,updated,summary,labels,assignee,issuetype,reporter,status,priority,created",
+                    "description": "Comma-separated fields to return in the results. Use '*all' for all fields, or specify individual fields like 'summary,status,assignee,priority'",
+                    "title": "Fields"
+                },
+                "limit": {
+                    "default": 10,
+                    "description": "Maximum number of results (1-50)",
+                    "minimum": 1,
+                    "title": "Limit",
+                    "type": "integer"
+                },
+                "start_at": {
+                    "default": 0,
+                    "description": "Starting index for pagination (0-based)",
+                    "minimum": 0,
+                    "title": "Start At",
+                    "type": "integer"
+                },
+                "projects_filter": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Comma-separated list of project keys to filter results by. Overrides the environment variable JIRA_PROJECTS_FILTER if provided.",
+                    "title": "Projects Filter"
+                },
+                "expand": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Optional fields to expand. Examples: 'renderedFields', 'transitions', 'changelog'",
+                    "title": "Expand"
+                }
+            },
+            "required": [
+                "jql"
+            ],
+            "title": "searchArguments",
+            "type": "object"
+        },
+        "annotations": null
+    },
+    {
+        "name": "jira_get_transitions",
+        "description": "Get available status transitions for a Jira issue.\n\n    Args:\n        ctx: The FastMCP context.\n        issue_key: Jira issue key.\n\n    Returns:\n        JSON string representing a list of available transitions.\n    ",
+        "inputSchema": {
+            "properties": {
+                "issue_key": {
+                    "description": "Jira issue key (e.g., 'PROJ-123')",
+                    "title": "Issue Key",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "issue_key"
+            ],
+            "title": "get_transitionsArguments",
+            "type": "object"
+        },
+        "annotations": null
+    },
+    {
+        "name": "jira_create_issue",
+        "description": "Create a new Jira issue with optional Epic link or parent for subtasks.\n\n    Args:\n        ctx: The FastMCP context.\n        project_key: The JIRA project key.\n        summary: Summary/title of the issue.\n        issue_type: Issue type (e.g., 'Task', 'Bug', 'Story', 'Epic', 'Subtask').\n        assignee: Assignee of the ticket (accountID, full name or e-mail).\n        description: Issue description.\n        components: Comma-separated list of component names.\n        additional_fields: Dictionary of additional fields.\n\n    Returns:\n        JSON string representing the created issue object.\n\n    Raises:\n        ValueError: If in read-only mode or Jira client is unavailable.\n    ",
+        "inputSchema": {
+            "properties": {
+                "project_key": {
+                    "description": "The JIRA project key (e.g. 'PROJ', 'DEV', 'SUPPORT'). This is the prefix of issue keys in your project. Never assume what it might be, always ask the user.",
+                    "title": "Project Key",
+                    "type": "string"
+                },
+                "summary": {
+                    "description": "Summary/title of the issue",
+                    "title": "Summary",
+                    "type": "string"
+                },
+                "issue_type": {
+                    "description": "Issue type (e.g. 'Task', 'Bug', 'Story', 'Epic', 'Subtask'). The available types depend on your project configuration. For subtasks, use 'Subtask' (not 'Sub-task') and include parent in additional_fields.",
+                    "title": "Issue Type",
+                    "type": "string"
+                },
+                "assignee": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Assignee of the ticket (accountID, full name or e-mail)",
+                    "title": "Assignee"
+                },
+                "description": {
+                    "default": "",
+                    "description": "Issue description",
+                    "title": "Description",
+                    "type": "string"
+                },
+                "components": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Comma-separated list of component names to assign (e.g., 'Frontend,API')",
+                    "title": "Components"
+                },
+                "additional_fields": {
+                    "anyOf": [
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Optional dictionary of additional fields to set. Examples:\n- Set priority: {'priority': {'name': 'High'}}\n- Add labels: {'labels': ['frontend', 'urgent']}\n- Link to parent (for any issue type): {'parent': 'PROJ-123'}\n- Set Fix Version/s: {'fixVersions': [{'id': '10020'}]}\n- Custom fields: {'customfield_10010': 'value'}",
+                    "title": "Additional Fields"
+                }
+            },
+            "required": [
+                "project_key",
+                "summary",
+                "issue_type"
+            ],
+            "title": "create_issueArguments",
+            "type": "object"
+        },
+        "annotations": null
+    },
+    {
+        "name": "jira_update_issue",
+        "description": "Update an existing Jira issue including changing status, adding Epic links, updating fields, etc.\n\n    Args:\n        ctx: The FastMCP context.\n        issue_key: Jira issue key.\n        fields: Dictionary of fields to update.\n        additional_fields: Optional dictionary of additional fields.\n        attachments: Optional JSON array string or comma-separated list of file paths.\n\n    Returns:\n        JSON string representing the updated issue object and attachment results.\n\n    Raises:\n        ValueError: If in read-only mode, Jira client unavailable, or invalid input.\n    ",
+        "inputSchema": {
+            "properties": {
+                "issue_key": {
+                    "description": "Jira issue key (e.g., 'PROJ-123')",
+                    "title": "Issue Key",
+                    "type": "string"
+                },
+                "fields": {
+                    "description": "A valid dictionary of fields to update. Example: {'summary': 'New title', 'description': 'Updated description', 'priority': {'name': 'High'}, 'assignee': 'john.doe'}",
+                    "title": "Fields",
+                    "type": "object"
+                },
+                "additional_fields": {
+                    "anyOf": [
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Optional dictionary of additional fields to update. Use this for custom fields or more complex updates.",
+                    "title": "Additional Fields"
+                },
+                "attachments": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Optional JSON string array or comma-separated list of file paths to attach to the issue. Example: '/path/to/file1.txt,/path/to/file2.txt' or ['/path/to/file1.txt','/path/to/file2.txt']",
+                    "title": "Attachments"
+                }
+            },
+            "required": [
+                "issue_key",
+                "fields"
+            ],
+            "title": "update_issueArguments",
+            "type": "object"
+        },
+        "annotations": null
+    },
+    {
+        "name": "jira_add_comment",
+        "description": "Add a comment to a Jira issue.\n\n    Args:\n        ctx: The FastMCP context.\n        issue_key: Jira issue key.\n        comment: Comment text in Markdown.\n\n    Returns:\n        JSON string representing the added comment object.\n\n    Raises:\n        ValueError: If in read-only mode or Jira client unavailable.\n    ",
+        "inputSchema": {
+            "properties": {
+                "issue_key": {
+                    "description": "Jira issue key (e.g., 'PROJ-123')",
+                    "title": "Issue Key",
+                    "type": "string"
+                },
+                "comment": {
+                    "description": "Comment text in Markdown format",
+                    "title": "Comment",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "issue_key",
+                "comment"
+            ],
+            "title": "add_commentArguments",
+            "type": "object"
+        },
+        "annotations": null
+    },
+    {
+        "name": "jira_transition_issue",
+        "description": "Transition a Jira issue to a new status.\n\n    Args:\n        ctx: The FastMCP context.\n        issue_key: Jira issue key.\n        transition_id: ID of the transition.\n        fields: Optional dictionary of fields to update during transition.\n        comment: Optional comment for the transition.\n\n    Returns:\n        JSON string representing the updated issue object.\n\n    Raises:\n        ValueError: If required fields missing, invalid input, in read-only mode, or Jira client unavailable.\n    ",
+        "inputSchema": {
+            "properties": {
+                "issue_key": {
+                    "description": "Jira issue key (e.g., 'PROJ-123')",
+                    "title": "Issue Key",
+                    "type": "string"
+                },
+                "transition_id": {
+                    "description": "ID of the transition to perform. Use the jira_get_transitions tool first to get the available transition IDs for the issue. Example values: '11', '21', '31'",
+                    "title": "Transition Id",
+                    "type": "string"
+                },
+                "fields": {
+                    "anyOf": [
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Optional dictionary of fields to update during the transition. Some transitions require specific fields to be set (e.g., resolution). Example: {'resolution': {'name': 'Fixed'}}",
+                    "title": "Fields"
+                },
+                "comment": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Comment to add during the transition (optional). This will be visible in the issue history.",
+                    "title": "Comment"
+                }
+            },
+            "required": [
+                "issue_key",
+                "transition_id"
+            ],
+            "title": "transition_issueArguments",
+            "type": "object"
+        },
+        "annotations": null
+    }
+]

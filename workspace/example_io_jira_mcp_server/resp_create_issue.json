@@ -1,0 +1,42 @@
+{
+  "message": "Issue created successfully",
+  "issue": {
+    "id": "10016",
+    "key": "MBA-12",
+    "summary": "Test issue",
+    "url": "https://aituning.atlassian.net/rest/api/2/issue/10016",
+    "status": {
+      "name": "To Do",
+      "category": "To Do",
+      "color": "blue-gray"
+    },
+    "issue_type": {
+      "name": "Task"
+    },
+    "priority": {
+      "name": "Medium"
+    },
+    "project": {
+      "key": "MBA",
+      "name": "Test project",
+      "avatar_url": "https://aituning.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10402"
+    },
+    "worklog": {
+      "startAt": 0,
+      "maxResults": 20,
+      "total": 0,
+      "worklogs": []
+    },
+    "assignee": {
+      "display_name": "Unassigned"
+    },
+    "reporter": {
+      "display_name": "Dan Austin",
+      "name": "Dan Austin",
+      "email": "dan@aituning.ai",
+      "avatar_url": "https://secure.gravatar.com/avatar/e1661112e372f0acac07dd6907e30135?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDA-6.png"
+    },
+    "created": "2025-05-09T15:09:50.834+0100",
+    "updated": "2025-05-09T15:09:50.894+0100"
+  }
+}

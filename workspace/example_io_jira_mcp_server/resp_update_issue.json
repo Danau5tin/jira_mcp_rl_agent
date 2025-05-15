@@ -1,0 +1,82 @@
+{
+  "message": "Issue updated successfully",
+  "issue": {
+    "id": "10004",
+    "key": "MBA-4",
+    "summary": "Updated ",
+    "url": "https://aituning.atlassian.net/rest/api/2/issue/10004",
+    "description": "Updated description",
+    "status": {
+      "name": "In Review",
+      "category": "In Progress",
+      "color": "yellow"
+    },
+    "issue_type": {
+      "name": "Task"
+    },
+    "priority": {
+      "name": "Medium"
+    },
+    "project": {
+      "key": "MBA",
+      "name": "Test project",
+      "avatar_url": "https://aituning.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10402"
+    },
+    "parent": {
+      "id": "10000",
+      "key": "MBA-1",
+      "self": "https://aituning.atlassian.net/rest/api/2/issue/10000",
+      "fields": {
+        "summary": "(Sample) User Authentication",
+        "status": {
+          "self": "https://aituning.atlassian.net/rest/api/2/status/10001",
+          "description": "",
+          "iconUrl": "https://aituning.atlassian.net/images/icons/statuses/generic.png",
+          "name": "In Progress",
+          "id": "10001",
+          "statusCategory": {
+            "self": "https://aituning.atlassian.net/rest/api/2/statuscategory/4",
+            "id": 4,
+            "key": "indeterminate",
+            "colorName": "yellow",
+            "name": "In Progress"
+          }
+        },
+        "priority": {
+          "self": "https://aituning.atlassian.net/rest/api/2/priority/3",
+          "iconUrl": "https://aituning.atlassian.net/images/icons/priorities/medium_new.svg",
+          "name": "Medium",
+          "id": "3"
+        },
+        "issuetype": {
+          "self": "https://aituning.atlassian.net/rest/api/2/issuetype/10001",
+          "id": "10001",
+          "description": "Epics track collections of related bugs, stories, and tasks.",
+          "iconUrl": "https://aituning.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10307?size=medium",
+          "name": "Epic",
+          "subtask": false,
+          "avatarId": 10307,
+          "entityId": "068fc035-71f7-44e8-960b-a42254d23d5a",
+          "hierarchyLevel": 1
+        }
+      }
+    },
+    "worklog": {
+      "startAt": 0,
+      "maxResults": 20,
+      "total": 0,
+      "worklogs": []
+    },
+    "assignee": {
+      "display_name": "Unassigned"
+    },
+    "reporter": {
+      "display_name": "Dan Austin",
+      "name": "Dan Austin",
+      "email": "dan@aituning.ai",
+      "avatar_url": "https://secure.gravatar.com/avatar/e1661112e372f0acac07dd6907e30135?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDA-6.png"
+    },
+    "created": "2025-05-07T17:38:53.984+0100",
+    "updated": "2025-05-09T15:11:39.098+0100"
+  }
+}

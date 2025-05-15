@@ -1,0 +1,25 @@
+{
+  "id": "10004",
+  "key": "MBA-4",
+  "summary": "(Sample) Implement Biometric Login",
+  "description": "Allow users to log in using fingerprint or facial recognition.",
+  "status": {
+    "name": "In Review",
+    "category": "In Progress",
+    "color": "yellow"
+  },
+  "priority": {
+    "name": "Medium"
+  },
+  "assignee": {
+    "display_name": "Unassigned"
+  },
+  "reporter": {
+    "display_name": "Dan Austin",
+    "name": "Dan Austin",
+    "email": "dan@aituning.ai",
+    "avatar_url": "https://secure.gravatar.com/avatar/e1661112e372f0acac07dd6907e30135?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDA-6.png"
+  },
+  "created": "2025-05-07T17:38:53.984+0100",
+  "updated": "2025-05-07T17:38:54.963+0100"
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "id": 11,
+    "name": "To Do"
+  },
+  {
+    "id": 21,
+    "name": "In Progress"
+  },
+  {
+    "id": 31,
+    "name": "In Review"
+  },
+  {
+    "id": 41,
+    "name": "Blocked"
+  },
+  {
+    "id": 51,
+    "name": "Done"
+  }
+]
