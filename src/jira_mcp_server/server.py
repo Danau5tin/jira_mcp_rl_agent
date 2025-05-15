@@ -31,7 +31,6 @@ class JiraMCPServer:
         self._mcp_session_manager = mcp_session_manager
         self._client_session = client_session
         self._tools = tools
-        client_session.list_tools() # TODO:
 
     @classmethod
     async def initialize(
