@@ -125,6 +125,7 @@ async def main(csv_file: str = DEFAULT_CSV_FILE) -> None:
 
         
         print("\nAll evaluations completed.\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        await stop_docker_container()
     
         # Exit cleanly due to the hanging container issue
         sys.exit(0)
