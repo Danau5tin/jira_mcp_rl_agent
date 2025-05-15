@@ -6,14 +6,19 @@ using predefined test cases from a CSV file.
 """
 
 import asyncio
+import json
 import os
 import subprocess
 import sys
-from typing import Dict, Literal, Optional
-from dotenv import load_dotenv
+from contextlib import AsyncExitStack
+from typing import Dict
 
-from load_data import load_eval_data, EvalDataPoint
-from run_agent import create_agent, run_agent
+from dotenv import load_dotenv
+from mcp.types import TextContent
+
+from src.agent import JiraMcpAgent
+from src.evals.load_data import EvalDataPoint, load_eval_data, load_example_dp
+from src.jira_mcp_server.server import JiraMCPServer
 
 DOCKER_CONTAINER_NAME = "mcp-atlassian"
 USER_ID = "user_id"
@@ -25,12 +30,6 @@ REQUIRED_ENV_VARS = ["JIRA_URL", "JIRA_USERNAME", "JIRA_API_TOKEN", "LITE_LLM_MO
 def validate_environment() -> Dict[str, str]:
     """
     Validate that all required environment variables are set.
-    
-    Returns:
-        Dict[str, str]: Dictionary containing the validated environment variables.
-    
-    Raises:
-        ValueError: If any required environment variable is missing.
     """
     env_vars = {}
     
@@ -45,72 +44,33 @@ def validate_environment() -> Dict[str, str]:
     return env_vars
 
 
-async def manage_docker_container(action: Literal["stop"]) -> None:
-    """
-    Manage the Docker container (start or stop).
-    
-    Args:
-        action (str): The action to perform ('start' or 'stop').
-    """
+async def stop_docker_container() -> None:
     try:
-        if action == "stop":
-            print(f"Removing container {DOCKER_CONTAINER_NAME}...")
-            subprocess.run(
-                ["docker", "rm", "-f", DOCKER_CONTAINER_NAME], 
-                check=True, 
-                capture_output=True
-            )
-            print(f"Container {DOCKER_CONTAINER_NAME} removed.")
+        print(f"Removing container {DOCKER_CONTAINER_NAME}...")
+        subprocess.run(
+            ["docker", "rm", "-f", DOCKER_CONTAINER_NAME], 
+            check=True, 
+            capture_output=True
+        )
+        print(f"Container {DOCKER_CONTAINER_NAME} removed.")
     except subprocess.CalledProcessError as e:
         # It's okay if the container doesn't exist when trying to remove it
-        if action == "stop" and "No such container" in str(e.stderr):
+        if "No such container" in str(e.stderr):
             print(f"Container {DOCKER_CONTAINER_NAME} does not exist. Continuing...")
         else:
             print(f"Error managing Docker container: {e}")
             raise
 
 
-async def run_evaluation(
-    eval_data: EvalDataPoint, 
-    model_name: str,
-    jira_url: str,
-    jira_username: str,
-    jira_api_token: str,
-    enabled_tools: str
-) -> None:
-    """
-    Run a single evaluation with the given data.
+def load_dps_from_csv(csv_file: str) -> list[EvalDataPoint]:
+    eval_data_list = load_eval_data(csv_file)
+    if not eval_data_list:
+        raise ValueError(f"No evaluation data found in {csv_file}. Please check the file.")
     
-    Args:
-        eval_data (EvalDataPoint): The evaluation data point to use.
-        model_name (str): The LiteLLM model name to use.
-        jira_url (str): The Jira URL.
-        jira_username (str): The Jira username.
-        jira_api_token (str): The Jira API token.
-        enabled_tools (str): Comma-separated list of enabled tools.
-    """
-    print(f"Creating agent for evaluation with prompt: {eval_data.prompt[:50]}...")
-    agent = await create_agent(
-        litellm_model_name=model_name,
-        jira_url=jira_url,
-        jira_username=jira_username,
-        jira_api_token=jira_api_token,
-        enabled_tools=enabled_tools,
-    )
-    
-    print("Running agent...")
-    trajectory = await run_agent(agent, USER_ID, SESSION_ID, eval_data.prompt)
-    print(f"Agent run completed with trajectory: {trajectory}")
+    return eval_data_list
 
 
-async def main(csv_file: Optional[str] = None) -> None:
-    """
-    Main function to run the evaluation.
-    
-    Args:
-        csv_file (Optional[str]): Path to the CSV file containing evaluation data.
-            If not provided, uses the default CSV file.
-    """
+async def main(csv_file: str = DEFAULT_CSV_FILE) -> None:
     load_dotenv()
     
     try:
@@ -119,42 +79,55 @@ async def main(csv_file: Optional[str] = None) -> None:
         print(f"Environment validation error: {e}")
         sys.exit(1)
     
-    csv_file = csv_file or DEFAULT_CSV_FILE
-    
-    try:       
-        eval_data_list = await load_eval_data(csv_file)
-        if not eval_data_list:
-            raise ValueError(f"No evaluation data found in {csv_file}. Please check the file.")
-        print(f"Loaded {len(eval_data_list)} evaluation data points.")
-        
-        for i, eval_data in enumerate(eval_data_list):
-            await manage_docker_container("stop")
+    async with AsyncExitStack() as stack:
+        mcp_server = await JiraMCPServer.initialize(
+            jira_url=env_vars["JIRA_URL"],
+            jira_username=env_vars["JIRA_USERNAME"],
+            jira_api_token=env_vars["JIRA_API_TOKEN"],
+            enabled_tools=env_vars["ENABLED_TOOLS"],
+            exit_stack=stack,
+            container_name=DOCKER_CONTAINER_NAME
+        )
+        mcp_tools = mcp_server.get_tools()
+        agent = JiraMcpAgent(
+            litellm_model_name=env_vars["LITE_LLM_MODEL_NAME"],
+            tools=mcp_tools,
+        )
+        eval_data_list = load_example_dp()
 
+        for i, eval_data in enumerate(eval_data_list):
             print(f"\nRunning evaluation {i+1}/{len(eval_data_list)}...")
+
             try:
-                await run_evaluation(
-                    eval_data,
-                    env_vars["LITE_LLM_MODEL_NAME"],
-                    env_vars["JIRA_URL"],
-                    env_vars["JIRA_USERNAME"],
-                    env_vars["JIRA_API_TOKEN"],
-                    env_vars["ENABLED_TOOLS"]
-                )
+                trajectory = await agent.run(prompt=eval_data.prompt)
+                print(f"Agent trajectory: {trajectory}")
+
+
+                if eval_data.state_validation_config:
+                    for validation in eval_data.state_validation_config.state_validation_calls:
+                        result = await mcp_server.call_tool(
+                            name=validation.tool_name,
+                            arguments=validation.arguments
+                        )
+                        content: TextContent = result.content
+                        content_dict = json.loads(content.text)
+                        is_valid = validation.validate_response(response=content_dict)
+
+                        if eval_data.state_validation_config.fail_fast and not is_valid:
+                            print(f"Validation failed for {validation.tool_name}.")
+                            ## TODO: Handle fail fast logic
+                            pass
+
+                    ## TODO: Do something with the validation results
+
             except Exception as e:
                 print(f"Error running evaluation: {e}")
-            finally:
-                # Due to a problem with a hanging container, we need to remove it after each run
-                # Bug report: https://github.com/sooperset/mcp-atlassian/issues/421
-                await manage_docker_container("stop")
+
         
-        print("\nAll evaluations completed.")
-    except Exception as e:
-        print(f"Error in main execution: {e}")
-    finally:
-        await manage_docker_container("stop")
+        print("\nAll evaluations completed.\n\n\n\n\n\n\n\n\n\n\n\n\n")
     
-    # Exit cleanly due to the hanging container issue
-    sys.exit(0)
+        # Exit cleanly due to the hanging container issue
+        sys.exit(0)
 
 
 if __name__ == "__main__":
