@@ -6,7 +6,6 @@ using predefined test cases from a CSV file.
 """
 
 import asyncio
-import json
 import os
 import subprocess
 import sys
@@ -14,8 +13,8 @@ from contextlib import AsyncExitStack
 from typing import Dict
 
 from dotenv import load_dotenv
-from mcp.types import TextContent
 
+from src.evals.eval_runner import run_evals
 from src.agent import JiraMcpAgent
 from src.evals.load_data import EvalDataPoint, load_eval_data, load_example_dp
 from src.jira_mcp_server.server import JiraMCPServer
@@ -94,35 +93,11 @@ async def main(csv_file: str = DEFAULT_CSV_FILE) -> None:
             tools=mcp_tools,
         )
         eval_data_list = load_example_dp()
-
-        for i, eval_data in enumerate(eval_data_list):
-            print(f"\nRunning evaluation {i+1}/{len(eval_data_list)}...")
-
-            try:
-                trajectory = await agent.run(prompt=eval_data.prompt)
-                print(f"Agent trajectory: {trajectory}")
-
-
-                if eval_data.state_validation_config:
-                    for validation in eval_data.state_validation_config.state_validation_calls:
-                        result = await mcp_server.call_tool(
-                            name=validation.tool_name,
-                            arguments=validation.arguments
-                        )
-                        content: TextContent = result.content
-                        content_dict = json.loads(content.text)
-                        is_valid = validation.validate_response(response=content_dict)
-
-                        if eval_data.state_validation_config.fail_fast and not is_valid:
-                            print(f"Validation failed for {validation.tool_name}.")
-                            ## TODO: Handle fail fast logic
-                            pass
-
-                    ## TODO: Do something with the validation results
-
-            except Exception as e:
-                print(f"Error running evaluation: {e}")
-
+        await run_evals(
+            agent=agent,
+            mcp_server=mcp_server,
+            eval_data_list=eval_data_list
+        )
         
         print("\nAll evaluations completed.\n\n\n\n\n\n\n\n\n\n\n\n\n")
         await stop_docker_container()
