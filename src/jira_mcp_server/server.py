@@ -16,7 +16,9 @@ class JiraMCPServer:
     """
     Manages an MCP server instance for interacting with Jira tools.
     """
+    _mcp_session_manager: MCPSessionManager
     _client_session: ClientSession
+    _tools: List[MCPTool]
 
     def __init__(
         self, 
