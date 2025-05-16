@@ -1,0 +1,67 @@
+{
+  "total": 3,
+  "start_at": -1,
+  "max_results": -1,
+  "issues": [
+    {
+      "id": "10020",
+      "key": "MBA-15",
+      "summary": "Discover prompt automation",
+      "description": "Investigate and explore opportunities for prompt automation to improve efficiency and productivity.",
+      "created": "2025-05-16T10:46:53.703+0100",
+      "updated": "2025-05-16T10:46:53.774+0100",
+      "status": {
+        "id": "10000",
+        "name": "To Do",
+        "description": "",
+        "icon_url": "https://aituning.atlassian.net/images/icons/statuses/generic.png",
+        "category": {
+          "id": 2,
+          "key": "new",
+          "name": "To Do",
+          "color_name": "blue-gray"
+        }
+      },
+      "issue_type": {
+        "id": "10003",
+        "name": "Task",
+        "description": "Tasks track small, distinct pieces of work.",
+        "icon_url": "https://aituning.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10318?size=medium"
+      },
+      "priority": {
+        "id": "3",
+        "name": "Medium",
+        "icon_url": "https://aituning.atlassian.net/images/icons/priorities/medium_new.svg"
+      },
+      "reporter": {
+        "account_id": "712020:5feca6f1-a2f5-412b-a18f-605549f59d10",
+        "display_name": "Dan Austin",
+        "email": "dan@aituning.ai",
+        "active": true,
+        "avatar_url": "https://secure.gravatar.com/avatar/e1661112e372f0acac07dd6907e30135?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDA-6.png",
+        "time_zone": "Europe/London"
+      },
+      "labels": [],
+      "components": [],
+      "comments": [],
+      "attachments": [],
+      "url": "https://aituning.atlassian.net/rest/api/2/issue/10020",
+      "fix_versions": [],
+      "custom_fields": {},
+      "requested_fields": [
+        "issuetype",
+        "reporter",
+        "created",
+        "updated",
+        "description",
+        "summary",
+        "status",
+        "labels",
+        "assignee",
+        "priority"
+      ],
+      "subtasks": [],
+      "changelogs": []
+    }
+  ]
+}

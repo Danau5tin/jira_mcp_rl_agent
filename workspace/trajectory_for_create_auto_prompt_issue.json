@@ -1,0 +1,70 @@
+{
+    "messages": [
+        {
+            "timestamp": 1747388807.9335,
+            "author": "user",
+            "role": "user",
+            "user_text_input": "Can you create a task for me in project MBA? Title is Discover prompt automation",
+            "assistant_text_response": null,
+            "assistant_tool_calls": null,
+            "tool_results": null
+        },
+        {
+            "timestamp": 1747388807.937834,
+            "author": "JiraMCPAgent",
+            "role": "assistant",
+            "user_text_input": null,
+            "assistant_text_response": "I'll help you create a task in the MBA project. I'll use the `jira_create_issue` function to do this. Since you didn't specify an assignee, I'll leave that blank. Would you like to add any additional details to the description?",
+            "assistant_tool_calls": [
+                {
+                    "call_id": "toolu_01SH35nwgqLk1tgN6QZqRgt3",
+                    "name": "jira_create_issue",
+                    "args": {
+                        "project_key": "MBA",
+                        "summary": "Discover prompt automation",
+                        "issue_type": "Task",
+                        "description": "Investigate and explore opportunities for prompt automation to improve efficiency and productivity."
+                    }
+                }
+            ],
+            "tool_results": null
+        },
+        {
+            "timestamp": 1747388814.689411,
+            "author": "JiraMCPAgent",
+            "role": "tool",
+            "user_text_input": null,
+            "assistant_text_response": null,
+            "assistant_tool_calls": null,
+            "tool_results": [
+                {
+                    "call_id": "toolu_01SH35nwgqLk1tgN6QZqRgt3",
+                    "name": "jira_create_issue",
+                    "result_data": {
+                        "result": {
+                            "meta": null,
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "{\n  \"message\": \"Issue created successfully\",\n  \"issue\": {\n    \"id\": \"10020\",\n    \"key\": \"MBA-15\",\n    \"summary\": \"Discover prompt automation\",\n    \"url\": \"https://aituning.atlassian.net/rest/api/2/issue/10020\",\n    \"description\": \"Investigate and explore opportunities for prompt automation to improve efficiency and productivity.\",\n    \"status\": {\n      \"name\": \"To Do\",\n      \"category\": \"To Do\",\n      \"color\": \"blue-gray\"\n    },\n    \"issue_type\": {\n      \"name\": \"Task\"\n    },\n    \"priority\": {\n      \"name\": \"Medium\"\n    },\n    \"project\": {\n      \"key\": \"MBA\",\n      \"name\": \"Test project\",\n      \"avatar_url\": \"https://aituning.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10402\"\n    },\n    \"worklog\": {\n      \"startAt\": 0,\n      \"maxResults\": 20,\n      \"total\": 0,\n      \"worklogs\": []\n    },\n    \"assignee\": {\n      \"display_name\": \"Unassigned\"\n    },\n    \"reporter\": {\n      \"display_name\": \"Dan Austin\",\n      \"name\": \"Dan Austin\",\n      \"email\": \"dan@aituning.ai\",\n      \"avatar_url\": \"https://secure.gravatar.com/avatar/e1661112e372f0acac07dd6907e30135?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDA-6.png\"\n    },\n    \"created\": \"2025-05-16T10:46:53.703+0100\",\n    \"updated\": \"2025-05-16T10:46:53.774+0100\"\n  }\n}",
+                                    "annotations": null
+                                }
+                            ],
+                            "isError": false
+                        }
+                    },
+                    "is_error": false
+                }
+            ]
+        },
+        {
+            "timestamp": 1747388814.691422,
+            "author": "JiraMCPAgent",
+            "role": "assistant",
+            "user_text_input": null,
+            "assistant_text_response": "I've created the task for you in the MBA project. The issue has been successfully created with the key MBA-15. I added a brief description to provide context for the task. The task is currently unassigned and in the \"To Do\" status with a default medium priority.\n\nWould you like me to assign the task to someone specific or add any labels or additional details?",
+            "assistant_tool_calls": null,
+            "tool_results": null
+        }
+    ]
+}
