@@ -1,7 +1,3 @@
-import json
-
-from mcp.types import TextContent
-
 from src.jira_mcp_server.server import JiraMCPServer
 from src.agent import JiraMcpAgent
 from src.evals.load_data import NewEvalDataPoint
@@ -15,16 +11,14 @@ async def run_single_eval(
     trajectory = await agent.run(prompt=eval_dp.prompt)
     print(f"Agent trajectory: {trajectory}")
 
-
     if eval_dp.state_validation_config:
         for validation in eval_dp.state_validation_config.state_validation_calls:
-            result = await mcp_server.call_tool(
+            result = await mcp_server.call_tool_dict_resp(
                 name=validation.tool_name,
                 arguments=validation.arguments
             )
-            content: TextContent = result.content
-            content_dict = json.loads(content.text)
-            is_valid = validation.validate_response(response=content_dict)
+            
+            is_valid = validation.validate_response(response=result)
 
             if eval_dp.state_validation_config.fail_fast and not is_valid:
                 print(f"Validation failed for {validation.tool_name}.")

@@ -1,4 +1,5 @@
 from contextlib import AsyncExitStack
+import json
 from typing import Dict, Any, List
 
 
@@ -6,7 +7,7 @@ from google.adk.tools.mcp_tool.mcp_session_manager import MCPSessionManager, Std
 from google.adk.tools.mcp_tool import MCPTool
 from mcp import ListToolsResult
 from mcp.client.session import ClientSession
-from mcp.types import CallToolResult
+from mcp.types import CallToolResult, TextContent
 
 
 APP_NAME = "jira_mcp_agent"
@@ -114,3 +115,14 @@ class JiraMCPServer:
             raise RuntimeError("JiraMCPServer not initialized. Call initialize() first.")
         
         return await self._client_session.call_tool(name=name, arguments=arguments)
+
+    async def call_tool_dict_resp(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Calls a tool on the connected MCP server and returns the response as a dictionary.
+        """
+        if not self._client_session:
+            raise RuntimeError("JiraMCPServer not initialized. Call initialize() first.")
+        
+        result = await self._client_session.call_tool(name=name, arguments=arguments)
+        content: TextContent = result.content[0]
+        return json.loads(content.text)
