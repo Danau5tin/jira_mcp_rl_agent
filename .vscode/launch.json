@@ -5,7 +5,7 @@
             "name": "run_evals",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/evals/runner_adk.py",
+            "program": "${workspaceFolder}/src/evals/main_run_evals.py",
             "console": "integratedTerminal"
         },
     ]
